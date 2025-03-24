@@ -20,7 +20,7 @@ const uint8_t PIN_PROGRAM_ACTIVE = 2;
 const uint8_t PIN_EXTERNAL_CLOCK = A1;  // We will use this as a digital pin.
 const uint8_t LCD_MAX_X = 16;
 const uint8_t LCD_MAX_Y = 2;
-const unsigned long RANDOM_SEED = 255;                 // Constant randomSeed() starting point.
+const uint32_t RANDOM_SEED = 255;                      // Constant randomSeed() starting point.
 const uint8_t PIN_THERMISTOR_SENSE = A0;               // A0
 const uint8_t THERMISTOR_NOMINAL_TEMPERATURE = 25;     // Almost always 25 degrees C; check datasheet.
 const uint8_t THERMISTOR_READ_SAMPLES = 5;             // How many times the voltage is read before deciding an average value.
@@ -33,8 +33,8 @@ const float TEMP_LOWERBOUND = 37.00;  // Fan off, single chirp.
 const float TEMP_UPPERBOUND = 41.00;  // Fan on until lowerbound is reached, multiple chirps.
 const float TEMP_MAXIMUM = 50.0;      // Fan on, different chirp tone. If enough cycles at or above this temperature, the board will shut down.
 const uint8_t TEMP_MAXIMUM_COUNT = 10;
-const long EXTERNAL_CLOCK_LOWERBOUND = 0;
-const long EXTERNAL_CLOCK_UPPERBOUND = 99;
+const int32_t EXTERNAL_CLOCK_LOWERBOUND = 0;
+const int32_t EXTERNAL_CLOCK_UPPERBOUND = 99;
 
 const uint8_t ERROR_CODES[3] = {
   0,  // No error, ignore.
@@ -46,14 +46,14 @@ const uint8_t ERROR_CODES[3] = {
   Program globals and counters.
 */
 float tempAccumulatedSamples = 0;
-float tempLifetimeMin = 999.9;                                      // Inverted to normalize during runtime.
-float tempLifetimeMax = -999.9;                                     // Inverted to normalize during runtime.
-long externalClockLifetimeMin = EXTERNAL_CLOCK_UPPERBOUND << 1;     // Inverted to normalize during runtime.
-long externalClockLifetimeMax = -(EXTERNAL_CLOCK_LOWERBOUND << 1);  // Inverted to normalize during runtime.
-uint8_t tempFanHandled = false;
-uint8_t showSplashScreen = 1;
+float tempLifetimeMin = 999.9;                                         // Inverted to normalize during runtime.
+float tempLifetimeMax = -999.9;                                        // Inverted to normalize during runtime.
+int32_t externalClockLifetimeMin = EXTERNAL_CLOCK_UPPERBOUND << 1;     // Inverted to normalize during runtime.
+int32_t externalClockLifetimeMax = -(EXTERNAL_CLOCK_LOWERBOUND << 1);  // Inverted to normalize during runtime.
+bool tempFanHandled = false;
+bool showSplashScreen = true;
 uint8_t tempHighCurrentCount = 0;
-unsigned long loopCount = 0;
+uint32_t loopCount = 0;
 uint8_t allPixels[8] = {
   0b11111,
   0b11111,
@@ -116,8 +116,8 @@ void loop() {
 /*
   Generates a random number of clock cycles to be output to the external CC.
 */
-void handleExternalClock(long rangeLowerbound, long rangeUpperbound, uint8_t clockLengthMs, uint16_t cycleDelayMs) {
-  long randomNumber = random(rangeLowerbound, rangeUpperbound + 1);
+void handleExternalClock(int32_t rangeLowerbound, int32_t rangeUpperbound, uint8_t clockLengthMs, uint16_t cycleDelayMs) {
+  int32_t randomNumber = random(rangeLowerbound, rangeUpperbound + 1);
 
   if (randomNumber < externalClockLifetimeMin) {
     externalClockLifetimeMin = randomNumber;
@@ -128,7 +128,7 @@ void handleExternalClock(long rangeLowerbound, long rangeUpperbound, uint8_t clo
   }
 
   if (randomNumber > 0) {
-    for (long i = 0; i < randomNumber; i++) {
+    for (int32_t i = 0; i < randomNumber; i++) {
       digitalWrite(PIN_EXTERNAL_CLOCK, HIGH);
       if (clockLengthMs > 0) {
         delay(clockLengthMs);
@@ -232,7 +232,7 @@ void write(uint8_t x, uint8_t y, const char* text, bool clearBeforeWrite) {
 /*
   Plays a tone on the board's buzzer.
 */
-void playTone(int frequency, long durationMs, uint8_t cycles, uint16_t cycleDelayMs, uint8_t pauseBeforeReturn) {
+void playTone(uint32_t frequency, int32_t durationMs, uint8_t cycles, uint16_t cycleDelayMs, bool pauseBeforeReturn) {
   for (uint8_t i = 0; i < cycles; i++) {
     tone(PIN_BUZZ, frequency, durationMs);
     if (i < cycles - 1) {
@@ -251,7 +251,7 @@ void playTone(int frequency, long durationMs, uint8_t cycles, uint16_t cycleDela
 /*
   Main error handler.
 */
-void error(uint8_t errorCode, int frequency, long durationMs, uint8_t cycles, uint16_t cycleDelayMs, uint8_t pauseBeforeReturn) {
+void error(uint8_t errorCode, int frequency, long durationMs, uint8_t cycles, uint16_t cycleDelayMs, bool pauseBeforeReturn) {
   sprintf(buffer, "E: %d", errorCode);
   write(0, 0, buffer, true);
   playTone(frequency, durationMs, cycles, cycleDelayMs, pauseBeforeReturn);
@@ -268,7 +268,7 @@ void handleSplashScreen() {
   if (showSplashScreen) {
     write(0, 0, "Illusion", true);
     write(0, 1, "Interactive", false);
-    showSplashScreen = 0;
+    showSplashScreen = false;
     delay(1000);
   }
 }
