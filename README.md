@@ -15,15 +15,7 @@ These boards supplement a larger bench setup and include Wi-Fi extensions and ad
 
 ---
 
-## 🧰 Bench Layout Overview
-
-- **Front row (to back):**
-  - 7Driver
-  - Discrete square wave counter
-  - Two custom prototyping boards (this repo), featuring Wi-Fi extensions and the bare PIC MCUs
-
-- **Left side:**
-  - Custom adjustable voltage regulator module
+![Schematic](Schematic.png)
 
 ---
 
@@ -41,6 +33,19 @@ These boards supplement a larger bench setup and include Wi-Fi extensions and ad
 
 ---
 
-![Schematic](Schematic.png)
+## 🧰 Bench Layout Overview
+
+- **Front row (to back):**
+  - 7Driver (https://github.com/Broosky/7Driver)
+  - Discrete square wave counter
+  - Two custom prototyping boards (this repo), featuring Wi-Fi extensions and the bare PIC MCUs
+
+- **Left side:**
+  - Custom adjustable voltage regulator module
+
+- **Right side:**
+  - Christmas tree
+
+---
 
 ![Boards](Boards.jpg)
