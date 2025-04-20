@@ -41,7 +41,7 @@ These boards supplement a larger bench setup and include Wi-Fi extensions and ad
   - Two Patchworks (this repo), featuring Wi-Fi extensions and the bare PIC MCUs
 
 - **Left side:**
-  - Custom adjustable voltage regulator module
+  - [Wattson](https://github.com/Broosky/Wattson)
 
 - **Right side:**
   - Christmas tree
