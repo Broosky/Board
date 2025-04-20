@@ -37,7 +37,7 @@ These boards supplement a larger bench setup and include Wi-Fi extensions and ad
 
 - **Front row (to back):**
   - [7Driver](https://github.com/Broosky/7Driver)
-  - Discrete square wave counter
+  - [Squarely](https://github.com/Broosky/Squarely)
   - Two Patchworks (this repo), featuring Wi-Fi extensions and the bare PIC MCUs
 
 - **Left side:**
