@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Program Name: Board (C)                                                                                                 //
+// Program Name: Patchworks (C)                                                                                            //
 // Author: Jeffrey Bednar                                                                                                  //
 // Copyright (c) Illusion Interactive, 2011 - 2025.                                                                        //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -111,7 +111,7 @@ void loop() {
   handleLoopEnd();
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Generates a random number of clock cycles to be output to the external CC.
+// Generates a random number of clock cycles to be output to the external CC. For Squarely's U6 74XX90 CP0 (pin 14).
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void handleExternalClock(int32_t rangeLowerbound, int32_t rangeUpperbound, uint8_t clockLengthMs, uint16_t cycleDelayMs) {
   int32_t randomNumber = random(rangeLowerbound, rangeUpperbound + 1);

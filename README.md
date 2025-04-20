@@ -1,4 +1,4 @@
-# 📟 Electronics Prototyping Boards
+# 📟 Patchworks
 
 This project consists of a set of custom electronics prototyping boards designed for testing and monitoring purposes. Each board features:
 
@@ -38,7 +38,7 @@ These boards supplement a larger bench setup and include Wi-Fi extensions and ad
 - **Front row (to back):**
   - [7Driver](https://github.com/Broosky/7Driver)
   - Discrete square wave counter
-  - Two custom prototyping boards (this repo), featuring Wi-Fi extensions and the bare PIC MCUs
+  - Two Patchworks (this repo), featuring Wi-Fi extensions and the bare PIC MCUs
 
 - **Left side:**
   - Custom adjustable voltage regulator module
@@ -48,4 +48,4 @@ These boards supplement a larger bench setup and include Wi-Fi extensions and ad
 
 ---
 
-![Boards](Boards.jpg)
+![Bench](Bench.jpg)

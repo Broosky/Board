@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=Board.X
+PROJECTNAME=Patchworks.X
 
 # Active Configuration
 DEFAULTCONF=default
