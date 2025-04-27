@@ -1,4 +1,4 @@
-# 📟 Patchworks
+# 🛠️ Patchworks
 
 This project consists of a set of custom electronics prototyping boards designed for testing and monitoring purposes. Each board features:
 
@@ -11,15 +11,13 @@ This project consists of a set of custom electronics prototyping boards designed
 
 These boards supplement a larger bench setup and include Wi-Fi extensions and additional prototyping space.
 
-> 📐 A schematic (KiCad 9) has been uploaded so I don't forget the circuit. 🙂
-
 ---
 
 ![Schematic](Schematic.png)
 
 ---
 
-## ⚙️ General Operation
+## 🔹 General Operation
 
 - Only **one power source** should be used at a time (battery **or** DC input)
   - It is safe to power the Arduino units via USB, regardless of which external power source is selected
@@ -33,7 +31,7 @@ These boards supplement a larger bench setup and include Wi-Fi extensions and ad
 
 ---
 
-## 🧰 Bench Layout Overview
+## 🔹 Bench Layout Overview
 
 - **Front row (to back):**
   - [7Driver](https://github.com/Broosky/7Driver)
