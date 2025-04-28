@@ -1,4 +1,4 @@
-# 🛠️ Patchworks
+# 💡 Patchworks
 
 This project consists of a set of custom electronics prototyping boards designed for testing and monitoring purposes. Each board features:
 
