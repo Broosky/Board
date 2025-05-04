@@ -4,7 +4,7 @@ This project consists of a set of custom electronics prototyping boards designed
 
 - An LCD display
 - Voltage, current, and power (V/A/W) gauges
-- 3.3V, 5V, and VCC rails (5–12 VDC) for the dual 830 tie-point breadboards
+- 3.3V, 5V, and VCC rails (5-12 VDC) for the dual 830 tie-point breadboards
 - A main ATmega328P Arduino Uno R3 for system monitoring (e.g., temperature and fan control for the regulator)
 - A bare ATmega-based Arduino Nano for breadboard-level microcontroller experimentation
 - A bare PIC16F887-IP for similar breadboard-based development (MPLAB X + PICkit 3)
@@ -27,7 +27,7 @@ These boards supplement a larger bench setup and include Wi-Fi extensions and ad
   - Verify the regulated VCC before engaging the power-on latch
 
 - Holding the button after POST completes will engage the **power-on latch**
-- The **power-on latch** is managed by the main Arduino Uno, allowing it to **shut down automatically** under certain fault conditions (currently based on temperature)
+- The **power-on latch** is managed by the main Arduino Uno, allowing it to **shut down automatically** under certain fault conditions (temperature or inefficient cooling)
 
 ---
 
