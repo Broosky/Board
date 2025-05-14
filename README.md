@@ -17,6 +17,12 @@ These boards supplement a larger bench setup and include Wi-Fi extensions and ad
 
 ---
 
+## 🔹 Ideas & Upcoming Changes
+
+- Change to fixed point arithmetic.
+
+---
+
 ## 🔹 General Operation
 
 - Only **one power source** should be used at a time (battery **or** DC input)
