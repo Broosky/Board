@@ -17,7 +17,7 @@ These boards supplement a larger bench setup and include Wi-Fi extensions and ad
 
 ---
 
-## 🔹 V1.1.0
+## 🔹 V1.1.1
 
 - Helpers, separations, and general review.
 

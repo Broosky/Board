@@ -19,7 +19,7 @@ extern LiquidCrystal_I2C lcd;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const uint8_t FW_VERSION_MAJOR = 1;
 const uint8_t FW_VERSION_MINOR = 1;
-const uint8_t FW_VERSION_PATCH = 0;
+const uint8_t FW_VERSION_PATCH = 1;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const uint8_t PIN_BUZZ = 8;
 const uint8_t PIN_FAN = 9;
@@ -234,6 +234,8 @@ void playTone(uint32_t frequency, int32_t durationMs, uint8_t cycles, uint16_t t
 void shutdown(ERROR_CODE_T errorCode, int frequency, long durationMs, uint8_t cycles, uint16_t toneCycleDelayMs, bool pauseBeforeReturn) {
   printLabeledInt(0, 0, "E: ", errorCode, true, 0);
   playTone(frequency, durationMs, cycles, toneCycleDelayMs, pauseBeforeReturn);
+
+  delay(5000);
 
   // Self-terminate.
   setPowerOnLatch(LOW);
