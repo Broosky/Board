@@ -17,9 +17,23 @@ These boards supplement a larger bench setup and include Wi-Fi extensions and ad
 
 ---
 
+## 🔹 V1.1.0
+
+- Helpers, separations, and general review.
+
+---
+
+## 🔹 V1.0.0
+
+- Tracking versions. Functionally the same.
+
+---
+
 ## 🔹 Ideas & Upcoming Changes
 
 - Change to fixed point arithmetic.
+- Contain related variables in structs or convert to fully object oriented to encapsulate fixed point arithmetic, LCD functions, and chip setup, among others.
+- Doxygen documentation.
 
 ---
 
