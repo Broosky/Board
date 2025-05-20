@@ -17,13 +17,13 @@ These boards supplement a larger bench setup and include Wi-Fi extensions and ad
 
 ---
 
-## 🔹 V1.1.1
+## 🔹 V1.1.1 / Rev 1
 
 - Helpers, separations, and general review.
 
 ---
 
-## 🔹 V1.0.0
+## 🔹 V1.0.0 / Rev 1
 
 - Tracking versions. Functionally the same.
 
