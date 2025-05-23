@@ -12,14 +12,15 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "Headers/fixed_point.h"
 #include "Headers/lcd.h"
+#include <EEPROM.h>  // 1024 bytes available, addresses: 0 - 1023, width: 8 bits. Degrades.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 extern LiquidCrystal_I2C lcd;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Program constants.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const uint8_t FW_VERSION_MAJOR = 1;
-const uint8_t FW_VERSION_MINOR = 1;
-const uint8_t FW_VERSION_PATCH = 1;
+const uint8_t FW_VERSION_MINOR = 2;
+const uint8_t FW_VERSION_PATCH = 0;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const uint8_t PIN_BUZZ = 8;
 const uint8_t PIN_FAN = 9;
@@ -43,16 +44,24 @@ const uint8_t TEMP_MAXIMUM_CYCLE_COUNT = 5;   // Number of cycles above maximum 
 const uint8_t TEMP_COOLDOWN_MAX_MINUTES = 3;  // Number of minutes to allow cooling to the lowerbound temperature before automatically shutting down.
 const int32_t EXTERNAL_CLOCK_LOWERBOUND = 0;
 const int32_t EXTERNAL_CLOCK_UPPERBOUND = 99;
-typedef enum ERROR_CODE {
-  ERROR_CODE_UNKNOWN,           // No error, ignore.
-  ERROR_CODE_INVALID,           // Invalid
-  ERROR_CODE_HOT_CYCLES,        // Too many cycles at or above maximum temperature.
-  ERROR_CODE_COOLDOWN_EXCEEDED  // Expected cooling duration exceeded.
+typedef enum ERROR_CODE {  // Align with ERROR_CODE_NAMES.
+  ERROR_CODE_NONE,         // No error, ignore.
+  ERROR_CODE_INVALID,      // Invalid
+  ERROR_CODE_HOT_CYCLES,   // Too many cycles at or above maximum temperature.
+  ERROR_CODE_COOLDOWN,     // Expected cooling duration exceeded.
+  ERROR_CODE_COUNT         // Must be last; for iterating/bounds.
 } ERROR_CODE_T;
+const char* ERROR_CODE_NAMES[] = {
+  "NONE",  // Align with ERROR_CODE.
+  "INVALID",
+  "HOT_CYCLES",
+  "COOLDOWN"
+};
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Program globals and counters.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 float tempAccumulatedSamples = 0;
+uint16_t fanCycleCount = 0;
 uint8_t tempHighCycleCount = 0;                                        // Cumulative, never resets.
 float tempLifetimeMin = 999.9;                                         // Inverted to normalize during runtime.
 float tempLifetimeMax = -999.9;                                        // Inverted to normalize during runtime.
@@ -61,6 +70,7 @@ int32_t externalClockLifetimeMax = -(EXTERNAL_CLOCK_UPPERBOUND << 1);  // Invert
 uint32_t cooldownLifetimeMinMs = UINT32_MAX;                           // Inverted to normalize during runtime.
 uint32_t cooldownLifetimeMaxMs = 0;                                    // Inverted to normalize during runtime.
 bool showSplashScreen = true;
+bool showLastKnownError = true;
 uint32_t loopCount = 0;
 uint8_t allPixels[8] = {
   0b11111,
@@ -100,6 +110,7 @@ void setup() {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void loop() {
   handleSplashScreen(DELAY_LCD_PAGE_CYCLE);
+  handleLastKnownError(DELAY_LCD_PAGE_CYCLE);
   handleLoopStart(DELAY_LCD_PAGE_CYCLE);
 
   handleExternalClock(EXTERNAL_CLOCK_LOWERBOUND,
@@ -122,7 +133,14 @@ void loop() {
   handleLoopEnd(DELAY_LOOP_COMPLETED);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Generates a random number of clock cycles to be output to the external CC. For Squarely's U6 74XX90 CP0 (pin 14).
+const char* getErrorCodeName(ERROR_CODE_T errorCode) {
+  if (errorCode >= ERROR_CODE_NONE && errorCode < ERROR_CODE_COUNT) {
+    return ERROR_CODE_NAMES[errorCode];
+  }
+  return "UNKNOWN";
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Generates a random number of clock cycles (purposely deterministic) to be output to the external CC. For Squarely's U6 74XX90 CP0 (pin 14).
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void handleExternalClock(int32_t rangeLowerbound, int32_t rangeUpperbound, uint8_t clockLengthMs, uint16_t lcdPageCycleDelayMs) {
   int32_t randomNumber = random(rangeLowerbound, rangeUpperbound + 1);
@@ -232,7 +250,12 @@ void playTone(uint32_t frequency, int32_t durationMs, uint8_t cycles, uint16_t t
 // Main error handler.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void shutdown(ERROR_CODE_T errorCode, int frequency, long durationMs, uint8_t cycles, uint16_t toneCycleDelayMs, bool pauseBeforeReturn) {
+  // Playing the tone acts as the LCD page delay.
   printLabeledInt(0, 0, "E: ", errorCode, true, 0);
+  printLabeledString(0, 1, "E: ", getErrorCodeName(errorCode), false, 0);
+
+  EEPROM.put(0, errorCode);
+
   playTone(frequency, durationMs, cycles, toneCycleDelayMs, pauseBeforeReturn);
 
   delay(5000);
@@ -262,6 +285,25 @@ void handleSplashScreen(uint16_t lcdPageCycleDelayMs) {
     printString(0, 1, time, false, lcdPageCycleDelayMs);
 
     showSplashScreen = false;
+  }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Handles the last known error on startup if there was an automatic fault shutdown.
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void handleLastKnownError(uint16_t lcdPageCycleDelayMs) {
+  if (showLastKnownError) {
+    ERROR_CODE_T errorCode;
+    EEPROM.get(0, errorCode);
+
+    if (errorCode > ERROR_CODE_NONE) {
+      printLabeledInt(0, 0, "El: ", errorCode, true, 0);
+      printLabeledString(0, 1, "El: ", getErrorCodeName(errorCode), false, lcdPageCycleDelayMs);
+
+      // Reset
+      EEPROM.put(0, ERROR_CODE_NONE);
+    }
+
+    showLastKnownError = false;
   }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -429,7 +471,10 @@ void handleThermistorFan(float currentTemperature, float tempLowerbound, float t
 
     if (!isCoolingDown) {
       isCoolingDown = true;
+
       digitalWrite(PIN_FAN, HIGH);
+      ++fanCycleCount;
+
       cooldownStartMs = millis();
     }
   } else if (currentTemperature <= tempLowerbound && isCoolingDown) {
@@ -443,7 +488,7 @@ void handleThermistorFan(float currentTemperature, float tempLowerbound, float t
 
   // Handle if we're not cooling down fast enough.
   if (isCoolingDown && handleCooldownExceeded(cooldownStartMs, cooldownMinutesMax)) {
-    shutdown(ERROR_CODE_COOLDOWN_EXCEEDED, 4000, 1000, 15, 250, true);
+    shutdown(ERROR_CODE_COOLDOWN, 4000, 1000, 15, 250, true);
   }
 
   // Fan temperature bounds.
@@ -452,5 +497,8 @@ void handleThermistorFan(float currentTemperature, float tempLowerbound, float t
 
   // Write out min and max cooldown durations.
   handleCooldownMessage(cooldownLifetimeMinMs, cooldownLifetimeMaxMs, lcdPageCycleDelayMs);
+
+  // Number of cycles the fan was turned on.
+  printLabeledInt(0, 0, "FCC: ", fanCycleCount, true, lcdPageCycleDelayMs);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

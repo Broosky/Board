@@ -17,6 +17,12 @@ These boards supplement a larger bench setup and include Wi-Fi extensions and ad
 
 ---
 
+## 🔹 V1.2.0 / Rev 1
+
+- Track fan cycles, store error code in EEPROM + interrogate on startup.
+
+---
+
 ## 🔹 V1.1.1 / Rev 1
 
 - Helpers, separations, and general review.
